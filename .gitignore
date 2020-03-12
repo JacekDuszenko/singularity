@@ -1,3 +1,5 @@
+core/core.iml
+core/.idea/
 dist
 dist-*
 cabal-dev
