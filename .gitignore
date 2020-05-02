@@ -1,3 +1,7 @@
+singularity/.idea
+singularity/.iml
+
+target/
 core/core.iml
 core/.idea/
 dist
