@@ -1,6 +1,7 @@
 package typeclasses
 
 import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 
 class RationalTest extends AnyFlatSpec {
 
@@ -9,6 +10,7 @@ class RationalTest extends AnyFlatSpec {
       Rational(2, 0)
     }
   }
+
   it should "add two rationals correctly" in {
     val expectedRat = Rational(5, 6)
 

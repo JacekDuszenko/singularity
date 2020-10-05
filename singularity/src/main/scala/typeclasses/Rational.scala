@@ -1,9 +1,13 @@
+package typeclasses
+
 import scala.annotation.tailrec
 
 object Rational {
-  def apply(nominator: Int, denominator: Int): Rational = new Rational(nominator, denominator)
-
-  def apply(nominator: Int): Rational = new Rational(nominator)
+  def apply(nominator:            Int, denominator: Int): Rational = new Rational(nominator, denominator)
+  def apply(nominator:            Int): Rational = new Rational(nominator)
+  implicit def intToRational(num: Int): Rational = {
+    Rational(num)
+  }
 }
 
 class Rational(n: Int, d: Int) {
@@ -37,7 +41,7 @@ class Rational(n: Int, d: Int) {
   }
 
   def *(that: Rational): Rational = {
-    Rational(numerator * that.numerator, denominator + that.denominator)
+    Rational(numerator * that.numerator, denominator * that.denominator)
   }
 
   def *(i: Int): Rational = {
