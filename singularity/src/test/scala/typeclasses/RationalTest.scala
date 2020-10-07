@@ -1,5 +1,6 @@
 package typeclasses
 
+import org.scalatest.Reporter
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 
@@ -26,5 +27,15 @@ class RationalTest extends AnyFlatSpec {
     val expandedRat = Rational(100, 200)
 
     expandedRat shouldBe expectedRat
+  }
+
+  it should "use test reporter in a method without throwing an exception" in {
+    def fun(rep: Reporter): Unit = {
+      print(rep)
+    }
+
+    fun(MockTestReporter)
+
+    // no exception thrown
   }
 }
