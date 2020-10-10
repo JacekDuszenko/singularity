@@ -17,7 +17,6 @@ class RationalTest extends AnyFlatSpec {
 
     val fst = Rational(1, 2)
     val snd = Rational(1, 3)
-
     fst + snd shouldBe expectedRat
   }
 
@@ -37,5 +36,24 @@ class RationalTest extends AnyFlatSpec {
     fun(MockTestReporter)
 
     // no exception thrown
+  }
+
+  it should "collect cmd opts from string interpolation, then move them to seq, then concatenate with space" in {
+    val cmdOpts =
+      s"""native-image
+           |-H:ConfigurationFileDirectories=/cfgs
+           |--no-fallback
+           |--allow-incomplete-classpath
+           |--no-server
+           |--static
+           |--enable-all-security-services
+           |--report-unsupported-elements-at-runtime
+           |-jar nameOfJarFile.jar
+           |""".stripMargin
+
+    val asSeq = cmdOpts.split("\n")
+    asSeq.length shouldBe 9
+    val asCmdLine = asSeq.mkString(" ")
+    print(asCmdLine)
   }
 }
