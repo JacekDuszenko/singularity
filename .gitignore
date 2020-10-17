@@ -1,6 +1,6 @@
 singularity/.idea
 singularity/.iml
-
+.idea/
 target/
 core/core.iml
 core/.idea/
