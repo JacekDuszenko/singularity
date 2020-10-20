@@ -31,31 +31,34 @@ case class STRING(str: String) extends LiteralToken with LexToken[String] {
 object LiteralTokenLexer extends RegexParsers with Lexer[LiteralToken] {
   override def skipWhitespace: Boolean = true
 
-  override def combined = bool | int | float | char | str
+  override def combined = lit
+  def lit               = bool | int | float | char | str
 
-  def id: Parser[ID] = "[a-zA-Z_][a-zA-Z0-9_]*".r ^^ { str =>
+  override def lex(code: String) = parse(lit, code)
+
+  private def id: Parser[ID] = "[a-zA-Z_][a-zA-Z0-9_]*".r ^^ { str =>
     ID(str)
   }
 
-  def bool: Parser[BOOL] = "#t|#f".r ^^ { str =>
+  private def bool: Parser[BOOL] = "#t|#f".r ^^ { str =>
     if (str == "#t") BOOL(true) else BOOL(false)
   }
 
-  def int: Parser[INT] = "\\d+".r ^^ { strnum =>
+  private def int: Parser[INT] = "^\\d+$".r ^^ { strnum =>
     INT(strnum.toInt)
   }
 
-  def float: Parser[FLOAT] = "[+-]?([0-9]*[.])?[0-9]+" ^^ { strflt =>
+  private def float: Parser[FLOAT] = "^[+-]?([0-9]*)?\\.[0-9]+$".r ^^ { strflt =>
     FLOAT(strflt.toFloat)
   }
 
-  def char: Parser[CHAR] = "'.'" ^^ { strchar =>
+  private def char: Parser[CHAR] = "\'.\'".r ^^ { strchar =>
     val singleChar = strchar.replace("'", "")
     if (singleChar.length == 1) CHAR(singleChar.charAt(0))
     else throw new RuntimeException("char parsing failed")
   }
 
-  def str: Parser[STRING] = """"[^"]*"""".r ^^ { str =>
+  private def str: Parser[STRING] = """"[^"]*"""".r ^^ { str =>
     val content = str.substring(1, str.length - 1)
     STRING(content)
   }
