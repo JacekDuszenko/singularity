@@ -3,7 +3,9 @@ package lexer
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 
-class LiteralTokenLexerTest extends AnyFlatSpec {
+import scala.util.parsing.combinator.Parsers
+
+class LiteralTokenLexerTest extends AnyFlatSpec with Parsers {
 
   val lexer: Lexer[LiteralToken] = LiteralTokenLexer
 

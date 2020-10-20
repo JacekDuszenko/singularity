@@ -24,15 +24,15 @@ case class STRING(str: String) extends LiteralToken with LexToken[String] {
 }
 
 /**
-  * object represents the namespace for lexing tokens in the language
-  * tokens parsed according to `token` section in
+  * LiteralTokenLexer object represents the namespace for lexing literal tokens in the language
+  * parsed according to `token` section in
   * https://www.cs.cmu.edu/Groups/AI/html/r4rs/r4rs_9.html
   */
 object LiteralTokenLexer extends RegexParsers with Lexer[LiteralToken] {
   override def skipWhitespace: Boolean = true
+  override def apply()                 = lit
 
-  override def combined = lit
-  def lit               = bool | int | float | char | str
+  def lit = bool | int | float | char | str
 
   override def lex(code: String) = parse(lit, code)
 
