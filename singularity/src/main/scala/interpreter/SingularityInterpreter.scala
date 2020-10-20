@@ -8,8 +8,7 @@ import parser.ExprParser
 class SingularityInterpreter {
 
   def interpret(code: String): Unit = {
-    val p: ExprParser = ExprParser
-
-    p.parseAll(p.simpleExpr, "")
+    val p: ExprParser = ExprParser()
+    p.parseAll(p.simpleExpr, code)
   }
 }
