@@ -13,5 +13,7 @@ libraryDependencies += "org.typelevel"          %% "cats-core"                % 
 
 //test deps
 libraryDependencies ++= Seq(
-  "org.scalatest" %% "scalatest" % "latest.integration" % "test"
+  "org.scalatest" %% "scalatest" % "3.3.0-SNAP2"  % "test",
+  "org.scalacheck" %% "scalacheck" % "1.14.1" % "test",
+  "org.scalatestplus" %% "scalatestplus-scalacheck" % "3.1.0.0-RC2" % "test"
 )

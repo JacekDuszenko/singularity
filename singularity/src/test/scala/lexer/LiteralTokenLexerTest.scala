@@ -22,6 +22,7 @@ class LiteralTokenLexerTest extends AnyFlatSpec with Parsers {
 
   it should "recognize correct int literal on string input from lexer" in {
     lexer.lex("123").get shouldBe INT(123)
+    lexer.lex("0").get shouldBe INT(0)
   }
 
   it should "recognize correct float literal on string input from lexer" in {

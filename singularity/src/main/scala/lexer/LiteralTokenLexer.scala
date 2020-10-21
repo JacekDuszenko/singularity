@@ -44,7 +44,7 @@ object LiteralTokenLexer extends RegexParsers with Lexer[LiteralToken] {
     if (str == "#t") BOOL(true) else BOOL(false)
   }
 
-  private def int: Parser[INT] = "^\\d+$".r ^^ { strnum =>
+  private def int: Parser[INT] = "^-?\\d+$".r ^^ { strnum =>
     INT(strnum.toInt)
   }
 
