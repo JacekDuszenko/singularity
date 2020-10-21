@@ -9,7 +9,7 @@ class LiteralTokenLexerProperty
     with Matchers
     with ScalaCheckDrivenPropertyChecks {
 
-  private val lexer: Lexer[LiteralToken] = LiteralTokenLexer
+  private val lexer: Lexer[_] = LiteralTokenLexer
 
   property("should literal int be mapped to int token") {
     forAll { num: Int =>

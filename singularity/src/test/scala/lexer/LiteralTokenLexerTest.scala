@@ -7,7 +7,7 @@ import scala.util.parsing.combinator.Parsers
 
 class LiteralTokenLexerTest extends AnyFlatSpec with Parsers {
 
-  val lexer: Lexer[LiteralToken] = LiteralTokenLexer
+  val lexer: Lexer[_] = LiteralTokenLexer
 
   it should "recognize correct bool literal on string input from lexer" in {
     val falseStr: String = "#f"
