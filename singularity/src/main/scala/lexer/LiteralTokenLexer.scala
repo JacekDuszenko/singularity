@@ -48,7 +48,10 @@ object LiteralTokenLexer extends RegexParsers with Lexer[LiteralToken] {
     INT(strnum.toInt)
   }
 
-  private def float: Parser[FLOAT] = "^[+-]?([0-9]*)?\\.[0-9]+$".r ^^ { strflt =>
+  private val simpleFloatReg = "^[+-]?([0-9]*)?\\.[0-9]+$".r
+  private val scientificNotationFloatReg = "-?[\\d.]+(?:E-?\\d+)?".r
+
+  private def float: Parser[FLOAT] = (simpleFloatReg | scientificNotationFloatReg) ^^ { strflt =>
     FLOAT(strflt.toFloat)
   }
 
