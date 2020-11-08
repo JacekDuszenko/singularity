@@ -5,9 +5,9 @@ import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 
 import scala.util.parsing.combinator.Parsers
 
-class LiteralTokenLexerTest extends AnyFlatSpec with Parsers {
+class ConstantTokenLexerTest extends AnyFlatSpec with Parsers {
 
-  val lexer: Lexer[_] = LiteralTokenLexer
+  val lexer: Lexer[_] = ConstantTokenLexer
 
   it should "recognize correct bool literal on string input from lexer" in {
     val falseStr: String = "#f"

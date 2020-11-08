@@ -4,12 +4,12 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.propspec.AnyPropSpec
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
-class LiteralTokenLexerProperty
+class ConstantTokenLexerProperty
     extends AnyPropSpec
     with Matchers
     with ScalaCheckDrivenPropertyChecks {
 
-  private val lexer: Lexer[_] = LiteralTokenLexer
+  private val lexer: Lexer[_] = ConstantTokenLexer
 
   property("should literal int be mapped to int token") {
     forAll { num: Int =>
@@ -18,11 +18,15 @@ class LiteralTokenLexerProperty
   }
 
   property("should char be mapped to char token") {
-    forAll { c: Char => lexer.lex(s"'$c'").get shouldBe CHAR(c) }
+    forAll { c: Char =>
+      lexer.lex(s"'$c'").get shouldBe CHAR(c)
+    }
   }
 
   property("should float be mapped to float token") {
-    forAll { f: Float => lexer.lex(s"$f").get shouldBe FLOAT(f) }
+    forAll { f: Float =>
+      lexer.lex(s"$f").get shouldBe FLOAT(f)
+    }
   }
 
   property("should string be mapped to string token") {
@@ -31,6 +35,7 @@ class LiteralTokenLexerProperty
         s"""
            |"$str"
            |""".stripMargin
-      lexer.lex(sfmt).get shouldBe STRING(str) }
+      lexer.lex(sfmt).get shouldBe STRING(str)
+    }
   }
 }
