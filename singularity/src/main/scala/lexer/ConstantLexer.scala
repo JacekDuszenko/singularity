@@ -30,7 +30,6 @@ case class STRING(str: String) extends LiteralToken[String] {
   */
 object ConstantTokenLexer extends RegexParsers with Lexer[LiteralToken[_]] {
   override def skipWhitespace: Boolean = true
-  override def apply()                 = lit
 
   def lit = bool | int | float | char | str
 
