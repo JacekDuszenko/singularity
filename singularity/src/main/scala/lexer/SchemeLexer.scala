@@ -1,55 +1,64 @@
 package lexer
 
 import lexer.ConstantTokenLexer.{bool, float, int, regex, str}
+import lexer.SchemeLexer.{inParens, lp, rp}
+
+import scala.util.parsing.combinator.Parsers
+
+object SchemeLexer extends Parsers {
+  val lp              = "\\(".r
+  val rp              = "\\)".r
+
+  def inParens[A](parser: Parser[A]): Parser[A] = {
+    lp & (parser) & rp
+  }
+}
 
 class SchemeLexer extends Lexer[LexToken[Any]] {
 
-//  val file          = ???
-//  val form          = ???
-//  val expression    = ???
-//  val definition    = ???
-//  val constant      = ???
-//  val variable      = ???
-//  val identifier    = ???
-//  val procedureCall = ???
-//  val operator      = ???
-//  val operand       = ???
-//  val operands      = ???
-//  val quotation     = ???
-//  val datum         = ???
-//  val quote         = ???
-//  val body          = ???
-//  val callPattern   = ???
-//  val pattern       = ???
-//  val boundVarList  = ???
-//  val test          = ???
-//  val consequent    = ???
-//  val alternate     = ???
-//  val condClause    = ???
-//  val caseClause    = ???
-//  val bindingSpec   = ???
-//  val iterationSpec = ???
-//
-//  val lambda   = ???
-//  val `if`     = ???
-//  val `ifElse` = ???
-//  val cond     = ???
-//  val condElse = ???
-//  val and      = ???
-//  val or       = ???
-//  val `case`   = ???
-//  val let      = ???
-//  val letrec   = ???
-//  val rec      = ???
-//  val begin    = ???
-//  val sequence = ???
-//  val `do`     = ???
-//  val delay    = ???
+  val program = commandOrDefinition.*
+  val commandOrDefinition = command | definition
+  val command = expression
+  val definition = inParens("define".r & variable & expression)
+
+  val expression = variable | literal | procedureCall | lambdaExpression | conditional | assignment | derivedExpression
+  val literal = selfEvaluating
+  val selfEvaluating = boolean | number | character | string
+  val procedureCall = inParens( operator & operand.* )
+  val operator = expression
+  val operand = expression
+  val lambdaExpression = inParens("lambda".r & formals & body)
+  val formals = inParens(variable.* ) | variable | inParens(variable.+ | "\\.".r | variable)
+  val body = definition.* & sequence
+  val sequence = command.* & sequence
+  val conditional = inParens("if".r & test & consequent & alternate)
+  val test = expression
+  val consequent = expression
+  val alternate = expression
+  val assignment = inParens("set!".r & variable & expression )
+  val derivedExpression = {
+      inParens("and".r & test.*)
+    | inParens("or".r & test.*)
+    | inParens("let".r & inParens(bindingSpec.*) & body)
+    | inParens("letrec".r & inParens(bindingSpec.*) & body)
+  }
+
+  val bindingSpec = inParens(variable & expression)
+
+  val keyword = identifier
+
+
+
+
+  val simpleDatum = boolean | number | character | string | symbol
+  val symbol = identifier
+
+  val compoundDatum = list
+  val list = inParens(datum.*) | inParens((datum.+) ".".r & datum)
+  val datum = simpleDatum | compoundDatum
 
   val singleQuote     = """"""".r
-  val lp              = "\\(".r
-  val rp              = "\\)".r
-  val token           = identifier | boolean | number | char | string | lp | rp | ("#".r & lp) | "'".r | "`".r | ",".r | ",@".r | "\\.".r
+  val token           = identifier | boolean | number | character | string | lp | rp | ("#".r & lp) | "'".r | "`".r | ",".r | ",@".r | "\\.".r
   val whitespace      = " ".r | "\n".r
   val delimiter       = whitespace | "\\(".r | "\\)".r | ";".r | singleQuote
   val comment         = ";.*^".r
@@ -78,7 +87,7 @@ class SchemeLexer extends Lexer[LexToken[Any]] {
   val syntacticKeyword = "else".r | "=>".r | "define".r | "unquote".r | "unquote-splicing".r | expressionKeyword
 
   val boolean = bool
-  val char    = """#c""".r ~ ConstantTokenLexer.char
+  val character    = """#c""".r ~ ConstantTokenLexer.char
   val string  = str
   val number  = int | float
 
