@@ -8,7 +8,6 @@ object Main {
     def f(s: String) = s.reverse.dropWhile(_ != '/').drop(1).reverse
 
     val c = "/home/jacek/testowy/algorytm"
-    val l = new SchemeLexer
     print(f(c))
   }
 }
