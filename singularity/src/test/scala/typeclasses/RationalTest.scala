@@ -38,6 +38,14 @@ class RationalTest extends AnyFlatSpec {
     // no exception thrown
   }
 
+  it should "get string from first trait method instead of second while mixing first trait as rightmost" in {
+    class SomeImplementer extends SecondTrait with OneTrait
+
+    val s   = new SomeImplementer
+    val res = s.method()
+    res shouldBe "firsty traity"
+  }
+
   it should "collect cmd opts from string interpolation, then move them to seq, then concatenate with space" in {
     val cmdOpts =
       s"""native-image
