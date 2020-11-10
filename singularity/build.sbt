@@ -10,6 +10,7 @@ version := "0.0.2"
 libraryDependencies += "org.typelevel"          %% "cats-core"                     % "2.0.0"
 libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators_2.13" % "1.1.2"
 libraryDependencies += "org.typelevel"          %% "cats-core"                     % "2.0.0"
+libraryDependencies += "com.chuusai"            %% "shapeless"                     % "2.3.3"
 
 //test deps
 libraryDependencies ++= Seq(
