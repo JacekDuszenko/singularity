@@ -69,7 +69,10 @@ object SchemeParser extends JavaTokenParsers {
       case l @ _ => l.map(tks => (tks._1, tks._2)) pipe COND
     }
 
-  private def write: Parser[WRITE] = inparens {}
+  private def write: Parser[WRITE] =
+    inparens {
+      "write" ~> spcd(expr)
+    } ^^ (xpr => WRITE(xpr))
 
   private def spcd[A](parser: Parser[A]) =
     space ~> parser <~ space
@@ -77,7 +80,7 @@ object SchemeParser extends JavaTokenParsers {
   private def inparens[A](parser: Parser[A], lp: Char = '(', rp: Char = ')') =
     space ~> lp ~> space ~> parser <~ space <~ rp <~ space
 
-  private val keywordExpr = lambda | `if` | listCons | cond | let
+  private val keywordExpr = lambda | `if` | listCons | cond | let | write
   private def userDefExpr = list | str | char | num | bool | id
 
   private def expr: Parser[Token[_]] = keywordExpr | userDefExpr ^^ identity
