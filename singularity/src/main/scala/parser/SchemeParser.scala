@@ -75,7 +75,5 @@ object SchemeParser extends JavaTokenParsers {
   def parse(code: String): Any = parse(expr, code).get
 }
 
-/*
-expr -> literal | id | list
-literal -> str | num | bool
- */
+//TODO parser -> let, write, define, define read
+//TODO start compiling stuff !
