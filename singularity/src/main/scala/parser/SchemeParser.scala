@@ -10,7 +10,7 @@ object SchemeParser extends JavaTokenParsers {
     ("#t".r | "#f".r) ^^ { case "#t" => BOOL(true); case "#f" => BOOL(false) }
 
   private def id: Parser[Token[String]] =
-    """[a-zA-Z=*+/<>!\?][a-zA-Z0-9=*+/<>!\?]*""".r ^^ { matched =>
+    """[a-zA-Z=*+/<>!\-\?][a-zA-Z0-9=*+/<>!\?]*""".r ^^ { matched =>
       ID(matched)
     }
 
@@ -23,11 +23,47 @@ object SchemeParser extends JavaTokenParsers {
   }
 
   private def list: Parser[LIST] =
-    '(' ~> space ~> rep(expr) <~ ')' <~ space ^^ { s: List[Token[_]] =>
+    '(' ~> space ~> rep(expr) <~ space <~ ')' <~ space ^^ { s: List[Token[_]] =>
       LIST(s)
     }
 
-  def expr: Parser[Token[_]] = id | str | num | bool | list ^^ identity
+  private def lambda: Parser[LAMBDA] = {
+    val args  = '(' ~> space ~> "lambda" ~> space ~> '(' ~> space ~> rep(id) <~ space <~ ')'
+    val exprs = space ~> list <~ ')'
+    args ~ exprs ^^ { arg =>
+      LAMBDA(arg._1, arg._2.scalaVal)
+    }
+  }
+
+  private def listCons: Parser[LISTCONS] =
+    inparens {
+      "list" ~> space ~> rep(expr) <~ space
+    } ^^ {
+      case (tokenz) => LISTCONS(tokenz)
+    }
+
+  private def `if`: Parser[IF] =
+    inparens {
+      "if" ~> space ~> (spcd(expr) ~ spcd(expr) ~ spcd(expr))
+    } ^^ {
+      case a ~ b ~ c => IF(a, b, c)
+    }
+
+  private def cond: Parser[COND] =
+    inparens {
+      "cond" ~> space ~> rep()
+    }
+
+  private def spcd[A](parser: Parser[A]) =
+    space ~> parser <~ space
+
+  private def inparens[A](parser: Parser[A], lp: Char = '(', rp: Char = ')') =
+    space ~> lp ~> space ~> parser <~ space <~ rp <~ space
+
+  private val keywordExpr = lambda | `if` | listCons
+  private def userDefExpr = list | str | num | bool | id
+
+  private def expr: Parser[Token[_]] = keywordExpr | userDefExpr ^^ identity
 
   def parse(code: String): Any = parse(expr, code).get
 }

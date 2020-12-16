@@ -1,10 +1,9 @@
 package typeclasses
 
 import org.scalatest.Reporter
-import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
+import util.ParseSpec
 
-class RationalTest extends AnyFlatSpec {
+class RationalTest extends ParseSpec {
 
   it should "throw IllegalArgumentException when rational initiated with 0 as denominator" in {
     assertThrows[IllegalArgumentException] {

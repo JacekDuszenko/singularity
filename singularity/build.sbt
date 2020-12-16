@@ -10,6 +10,7 @@ libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % 
 libraryDependencies += "org.typelevel"          %% "cats-core"                % "2.0.0"
 libraryDependencies += "com.chuusai"            %% "shapeless"                % "2.3.3"
 libraryDependencies += "javassist"              % "javassist"                 % "3.12.1.GA"
+libraryDependencies += "org.typelevel"          %% "cats-effect"              % "2.2.0"
 
 //test deps
 libraryDependencies ++= Seq(

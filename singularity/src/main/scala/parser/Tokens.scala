@@ -1,5 +1,7 @@
 package parser
 
+import parser.HelperTypes.LambdaType
+
 sealed trait Token[A] {
   val scalaVal: A
 }
@@ -25,4 +27,25 @@ final case class STRING(str: String) extends Token[String] {
 
 final case class LIST(vals: List[Token[_]]) extends Token[List[Token[_]]] {
   override val scalaVal: List[Token[_]] = vals
+}
+
+final case class IF(cond: Token[_], positive: Token[_], negative: Token[_])
+    extends Token[(Token[_], Token[_], Token[_])] {
+  override val scalaVal = (cond, positive, negative)
+}
+
+final case class LAMBDA(vars: List[Token[_]], exprs: List[Token[_]]) extends Token[LambdaType] {
+  override val scalaVal = (vars, exprs)
+}
+
+final case class LISTCONS(elems: List[Token[_]]) extends Token[List[Token[_]]] {
+  override val scalaVal = elems
+}
+
+final case class COND(elems: List[(Token[_], Token[_])]) extends Token[List[(Token[_], Token[_])]] {
+  override val scalaVal = elems
+}
+
+object HelperTypes {
+  type LambdaType = (List[Token[_]], List[Token[_]])
 }
