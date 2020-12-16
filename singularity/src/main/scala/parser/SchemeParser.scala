@@ -1,7 +1,7 @@
 package parser
 
-import scala.util.parsing.combinator.JavaTokenParsers
 import scala.util.chaining._
+import scala.util.parsing.combinator.JavaTokenParsers
 
 object SchemeParser extends JavaTokenParsers {
   type AnyValToken = Token[_]
@@ -40,12 +40,20 @@ object SchemeParser extends JavaTokenParsers {
     }
   }
 
+  private def let: Parser[LIST] =
+    inparens {
+      "let" ~> space ~> inparens {
+        spcd(rep(inparens(spcd(id) ~ spcd(expr), lp = '[', rp = ']')))
+      } ~ spcd(expr)
+    } ^^ {
+      case (bindings @ _) ~ (expression @ _) =>
+        LIST(List(LAMBDA(bindings.map(_._1), expression)) ++ bindings.map(_._2))
+    }
+
   private def listCons: Parser[LISTCONS] =
     inparens {
       "list" ~> space ~> rep(expr) <~ space
-    } ^^ {
-      case (tokenz) => LISTCONS(tokenz)
-    }
+    } ^^ (tokenz => LISTCONS(tokenz))
 
   private def `if`: Parser[IF] =
     inparens {
@@ -61,19 +69,31 @@ object SchemeParser extends JavaTokenParsers {
       case l @ _ => l.map(tks => (tks._1, tks._2)) pipe COND
     }
 
+  private def write: Parser[WRITE] = inparens {}
+
   private def spcd[A](parser: Parser[A]) =
     space ~> parser <~ space
 
   private def inparens[A](parser: Parser[A], lp: Char = '(', rp: Char = ')') =
     space ~> lp ~> space ~> parser <~ space <~ rp <~ space
 
-  private val keywordExpr = lambda | `if` | listCons | cond
+  private val keywordExpr = lambda | `if` | listCons | cond | let
   private def userDefExpr = list | str | char | num | bool | id
 
   private def expr: Parser[Token[_]] = keywordExpr | userDefExpr ^^ identity
 
-  def parse(code: String): Any = parse(expr, code).get
-}
+  private def readDef: Parser[READDEF] =
+    inparens("define" ~> spcd(id) <~ "read") ^^ (a => READDEF(ID(a.scalaVal)))
 
-//TODO parser -> let, write, define, define read
-//TODO start compiling stuff !
+  private def regularDef: Parser[DEF] = inparens("define" ~> spcd(id) ~ spcd(expr)) ^^ {
+    case arg ~ ex => DEF(ID(arg.scalaVal), ex)
+  }
+
+  private def definition: Parser[Token[_]] = (readDef | regularDef) ^^ identity
+
+  private def form = definition | expr
+
+  private def program = rep(spcd(form))
+
+  def parse(code: String): Any = parse(program, code).get
+}

@@ -51,6 +51,18 @@ final case class COND(elems: List[(Token[_], Token[_])]) extends Token[List[(Tok
   override val scalaVal = elems
 }
 
+final case class READDEF(elem: ID) extends Token[ID] {
+  override val scalaVal = elem
+}
+
+final case class DEF(elem: ID, expr: Token[_]) extends Token[(ID, Token[_])] {
+  override val scalaVal = (elem, expr)
+}
+
+final case class WRITE(expr: Token[_]) extends Token[Token[_]] {
+  override val scalaVal = expr
+}
+
 object HelperTypes {
   type LambdaType = (List[Token[_]], Token[_])
 }
