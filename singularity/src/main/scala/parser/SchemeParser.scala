@@ -1,6 +1,7 @@
 package parser
 
 import scala.util.parsing.combinator.JavaTokenParsers
+import scala.util.chaining._
 
 object SchemeParser extends JavaTokenParsers {
   type AnyValToken = Token[_]
@@ -22,16 +23,20 @@ object SchemeParser extends JavaTokenParsers {
     STRING(s)
   }
 
+  private def char: Parser[Token[Char]] = '\'' ~> ".".r <~ '\'' ^^ { e =>
+    CHAR(e.charAt(0))
+  }
+
   private def list: Parser[LIST] =
     '(' ~> space ~> rep(expr) <~ space <~ ')' <~ space ^^ { s: List[Token[_]] =>
       LIST(s)
     }
 
   private def lambda: Parser[LAMBDA] = {
-    val args  = '(' ~> space ~> "lambda" ~> space ~> '(' ~> space ~> rep(id) <~ space <~ ')'
-    val exprs = space ~> list <~ ')'
-    args ~ exprs ^^ { arg =>
-      LAMBDA(arg._1, arg._2.scalaVal)
+    val args       = '(' ~> space ~> "lambda" ~> space ~> '(' ~> space ~> rep(id) <~ space <~ ')'
+    val expression = space ~> expr <~ space <~ ')'
+    args ~ expression ^^ { arg =>
+      LAMBDA(arg._1, arg._2)
     }
   }
 
@@ -51,7 +56,9 @@ object SchemeParser extends JavaTokenParsers {
 
   private def cond: Parser[COND] =
     inparens {
-      "cond" ~> space ~> rep()
+      "cond" ~> spcd(rep(inparens(spcd(expr) ~ spcd(expr), lp = '[', rp = ']')))
+    } ^^ {
+      case l @ _ => l.map(tks => (tks._1, tks._2)) pipe COND
     }
 
   private def spcd[A](parser: Parser[A]) =
@@ -60,8 +67,8 @@ object SchemeParser extends JavaTokenParsers {
   private def inparens[A](parser: Parser[A], lp: Char = '(', rp: Char = ')') =
     space ~> lp ~> space ~> parser <~ space <~ rp <~ space
 
-  private val keywordExpr = lambda | `if` | listCons
-  private def userDefExpr = list | str | num | bool | id
+  private val keywordExpr = lambda | `if` | listCons | cond
+  private def userDefExpr = list | str | char | num | bool | id
 
   private def expr: Parser[Token[_]] = keywordExpr | userDefExpr ^^ identity
 
