@@ -98,5 +98,5 @@ object SchemeParser extends JavaTokenParsers {
 
   private def program = rep(spcd(form))
 
-  def parse(code: String): Any = parse(program, code).get
+  def parse(code: String): List[Token[_]] = parse(program, code).get
 }
