@@ -1,10 +1,12 @@
-package codegen
+package codegen.creator.impl
 
 import codegen.CodegenHelpers.getMain
 import codegen.VariableType.STRING
+import codegen.creator.Creator
+import codegen.{Context, VariableMetadata}
 import javassist.ClassPool
 
-class ReadCreator(currentContext: Context, variableId: String) {
+class ReadCreator(currentContext: Context, variableId: String) extends Creator {
 
   def handle: (Context, String) = {
     handleCodegen()

@@ -3,9 +3,10 @@ package codegen
 import cats.data.State
 import cats.effect.IO
 import codegen.TypeSystemBootstrapper.initializeTypeSystemBuilder
+import codegen.creator.impl.{ReadCreator, WriteCreator}
 import config.SETTINGS
 import javassist.ClassPool
-import model.{ID, READDEF, Token}
+import model.{DEF, ID, READDEF, Token, WRITE}
 
 final case class CodeGenerator(tks: List[Token[_]]) {
 
@@ -32,8 +33,10 @@ final case class CodeGenerator(tks: List[Token[_]]) {
   private def transformToState(tkn: Token[_]): State[Context, String] = State[Context, String] {
     context =>
       tkn match {
+        case DEF(elem, expr)
         case READDEF(elem: ID) =>
           new ReadCreator(context, elem.scalaVal).handle
+        case WRITE(expr) => WriteCreator(context, expr).handle
       }
   }
 
