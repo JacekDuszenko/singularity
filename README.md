@@ -5,15 +5,15 @@ Development plan:
 
 1. Lexer & parser 
 - [x] Basic data types (int, str, float, char, bool)
-- [ ] read and write instructions
-- [ ] function invokation syntax
-- [ ] if else then
-- [ ] let rec 
-- [ ] pattern matching
+- [x] read and write instructions
+- [x] function invokation syntax
+- [x] if else then
+- [x] let rec 
+- [x] pattern matching
 
 2. ast traversal & bytecode gen
-- [ ] main class with main method 
-- [ ] read and write bytecode gen
+- [x] main class with main method 
+- [x] read and write bytecode gen
 - [ ] function invokation
 - [ ] if else then
 - [ ] let rec
@@ -21,6 +21,6 @@ Development plan:
 
 
 3. optimization & utility
-- [ ] import native java classes
+- [x] import native java classes
 - [ ] recursion tco
 - [ ] repl 
