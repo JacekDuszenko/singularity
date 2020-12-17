@@ -1,5 +1,6 @@
 package parser
 
+import model.{BOOL, ID, IF, INT, LIST}
 import util.ParseSpec
 
 class ParserIfTest extends ParseSpec {

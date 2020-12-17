@@ -1,5 +1,7 @@
 package parser
 
+import model.{BOOL, CHAR, COND, DEF, ID, IF, INT, LAMBDA, LIST, LISTCONS, READDEF, STRING, Token, WRITE}
+
 import scala.util.chaining._
 import scala.util.parsing.combinator.JavaTokenParsers
 

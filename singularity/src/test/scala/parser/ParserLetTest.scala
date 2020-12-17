@@ -1,5 +1,6 @@
 package parser
 
+import model.{BOOL, ID, INT, LAMBDA, LIST}
 import util.ParseSpec
 
 class ParserLetTest extends ParseSpec {

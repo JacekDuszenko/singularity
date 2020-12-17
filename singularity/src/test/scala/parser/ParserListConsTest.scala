@@ -1,5 +1,6 @@
 package parser
 
+import model.{INT, LISTCONS}
 import util.ParseSpec
 
 class ParserListConsTest extends ParseSpec {

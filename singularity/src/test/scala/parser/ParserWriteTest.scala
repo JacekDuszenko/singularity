@@ -1,5 +1,6 @@
 package parser
 
+import model.{STRING, WRITE}
 import util.ParseSpec
 
 class ParserWriteTest extends ParseSpec {

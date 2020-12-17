@@ -1,2 +1,5 @@
 package config
-object SETTINGS {}
+
+object SETTINGS {
+  val CompileOutputDir: String = "WYNIK_KOMPILACJI"
+}

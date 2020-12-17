@@ -1,5 +1,6 @@
 package parser
 
+import model.{BOOL, CHAR, INT, LIST}
 import util.ParseSpec
 
 class ParserPrimitivesTest extends ParseSpec {

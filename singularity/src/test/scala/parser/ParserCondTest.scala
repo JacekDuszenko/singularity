@@ -1,5 +1,6 @@
 package parser
 
+import model.{BOOL, CHAR, COND, ID, INT, LAMBDA, LIST, LISTCONS}
 import util.ParseSpec
 
 class ParserCondTest extends ParseSpec {

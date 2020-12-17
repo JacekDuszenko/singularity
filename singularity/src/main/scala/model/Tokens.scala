@@ -1,6 +1,6 @@
-package parser
+package model
 
-import parser.HelperTypes.LambdaType
+import model.HelperTypes.LambdaType
 
 sealed trait Token[A] {
   val scalaVal: A

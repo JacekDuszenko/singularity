@@ -1,4 +1,3 @@
-*/WYNIK_KOMPILACJI
 singularity/.idea
 singularity/.iml
 .idea/
@@ -28,3 +27,4 @@ cabal.project.local
 cabal.project.local~
 .HTF/
 .ghc.environment.*
+singularity/WYNIK_KOMPILACJI/Main.class

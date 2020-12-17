@@ -17,10 +17,9 @@ object Main extends IOApp {
           }
     } yield ExitCode.Success
 
-  private def validateArgs(args: List[String]) = {
+  private def validateArgs(args: List[String]) =
     if (args.length != 1) IO.raiseError(new RuntimeException("need to have only one arg"))
     else IO.unit
-  }
 
   private def getCodeFileReference(args: List[String]) = IO(new File(args.head))
 
@@ -32,11 +31,10 @@ object Main extends IOApp {
       _      <- CodeGenerator(tokens).generateCode
     } yield ()
 
-  private def loadCodeFromFile(codeFile: File): Resource[IO, FileInputStream] = {
+  private def loadCodeFromFile(codeFile: File): Resource[IO, FileInputStream] =
     Resource.make {
       IO(new FileInputStream(codeFile))
     } { fis =>
       IO(fis.close()).handleErrorWith(exc => IO(println(exc.getMessage)))
     }
-  }
 }

@@ -1,5 +1,6 @@
 package parser
 
+import model.{ID, INT, LAMBDA, LIST}
 import util.ParseSpec
 
 class ParserAnonFuncTest extends ParseSpec {
