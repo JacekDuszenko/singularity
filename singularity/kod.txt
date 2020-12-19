@@ -1,6 +1,1 @@
-(define x read)
-(write x)
-(write "XD")
-(write #t)
-(write 42)
-(write 'a')
+(lambda (x) (write x))

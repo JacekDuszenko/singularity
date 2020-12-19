@@ -3,24 +3,24 @@ package codegen
 import cats.data.State
 import cats.effect.IO
 import codegen.TypeSystemBootstrapper.initializeTypeSystemBuilder
-import codegen.creator.impl.{ReadCreator, WriteCreator}
+import codegen.creator.impl.{LambdaCreator, ReadCreator, WriteCreator}
 import config.SETTINGS
 import javassist.ClassPool
-import model.{DEF, ID, READDEF, Token, WRITE}
+import model.{DEF, ID, LAMBDA, READDEF, Token, WRITE}
 
 final case class CodeGenerator(tks: List[Token[_]]) {
 
   def generateCode: IO[Unit] =
     for {
       _           <- logTokens
-      codegenPlan <- buildState
+      codegenPlan <- buildCodegenPlan
       _           <- generate(codegenPlan)
     } yield ()
 
   def generate(codegenPlan: State[Context, String]): IO[Unit] =
     IO(codegenPlan.run(initContext).value._1)
 
-  private def buildState: IO[State[Context, String]] =
+  private def buildCodegenPlan: IO[State[Context, String]] =
     IO(
       tks
         .map(transformToState)
@@ -33,10 +33,11 @@ final case class CodeGenerator(tks: List[Token[_]]) {
   private def transformToState(tkn: Token[_]): State[Context, String] = State[Context, String] {
     context =>
       tkn match {
-        case DEF(elem, expr)
+//        case DEF(elem, expr) =>
         case READDEF(elem: ID) =>
           new ReadCreator(context, elem.scalaVal).handle
-        case WRITE(expr) => WriteCreator(context, expr).handle
+        case WRITE(expr)        => WriteCreator(context, expr).handle
+        case LAMBDA(vars, expr) => LambdaCreator(context, vars, expr).handle
       }
   }
 

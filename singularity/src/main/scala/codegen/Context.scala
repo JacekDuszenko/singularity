@@ -2,7 +2,11 @@ package codegen
 
 import enumeratum._
 
-final case class Context(scope: Map[String, VariableMetadata], classnamesToWrite: List[String])
+final case class Context(
+    scope:             Map[String, VariableMetadata],
+    classnamesToWrite: List[String],
+    anonCtr:           Int = 1
+)
 
 case class VariableMetadata(name: String, `type`: VariableType)
 
