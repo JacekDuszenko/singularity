@@ -1,6 +1,6 @@
 package parser
 
-import model.{BOOL, CHAR, COND, DEF, ID, IF, INT, LAMBDA, LIST, LISTCONS, READDEF, STRING, Token, WRITE}
+import model._
 
 import scala.util.chaining._
 import scala.util.parsing.combinator.JavaTokenParsers
@@ -21,7 +21,7 @@ object SchemeParser extends JavaTokenParsers {
     INT(s.toInt)
   }
 
-  private def str: Parser[Token[String]] = '"' ~> """[^""]*""".r <~ '"' <~ space ^^ { s =>
+  private def str: Parser[Token[String]] = spcd('"' ~> """[^""]*""".r <~ '"') ^^ { s =>
     STRING(s)
   }
 
@@ -30,7 +30,7 @@ object SchemeParser extends JavaTokenParsers {
   }
 
   private def list: Parser[LIST] =
-    '(' ~> space ~> rep(expr) <~ space <~ ')' <~ space ^^ { s: List[Token[_]] =>
+    spcd(inparens(spcd(rep(expr)))) ^^ { s: List[Token[_]] =>
       LIST(s)
     }
 

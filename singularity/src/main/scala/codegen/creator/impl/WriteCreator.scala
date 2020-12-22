@@ -15,8 +15,9 @@ case class WriteCreator(ctx: Context, expr: Token[_]) extends Creator {
 }
 
 object WriteCreator {
-  def handlePrint(methodToHandle: CtMethod, expr: Token[_]): Unit = {
+  def handlePrint(methodToHandle: CtMethod, expr: Token[_], lambda: Boolean = false): Unit = {
     expr match {
+      case ID(_) if lambda    => prt(methodToHandle, "$1")
       case ID(str)            => prt(methodToHandle, str)
       case STRING(str)        => prt(methodToHandle, s""" "$str" """)
       case BOOL(b)            => prt(methodToHandle, if (b) "true" else "false")

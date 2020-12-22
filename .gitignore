@@ -28,3 +28,4 @@ cabal.project.local~
 .HTF/
 .ghc.environment.*
 singularity/WYNIK_KOMPILACJI/Main.class
+singularity/WYNIK_KOMPILACJI

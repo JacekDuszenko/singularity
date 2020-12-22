@@ -2,11 +2,12 @@ package codegen
 
 import cats.data.State
 import cats.effect.IO
+import codegen.CodegenHelpers.getMain
 import codegen.TypeSystemBootstrapper.initializeTypeSystemBuilder
-import codegen.creator.impl.{LambdaCreator, ReadCreator, WriteCreator}
+import codegen.creator.impl.{AppCreator, LambdaCreator, ReadCreator, WriteCreator}
 import config.SETTINGS
-import javassist.ClassPool
-import model.{DEF, ID, LAMBDA, READDEF, Token, WRITE}
+import javassist.{ClassPool, CtMethod}
+import model._
 
 final case class CodeGenerator(tks: List[Token[_]]) {
 
@@ -23,23 +24,33 @@ final case class CodeGenerator(tks: List[Token[_]]) {
   private def buildCodegenPlan: IO[State[Context, String]] =
     IO(
       tks
-        .map(transformToState)
+        .map(stateTransformer(getMain, "Main", "main"))
         .foldLeft(initializeTypeSystemBuilder)(
           (ss, aa) => ss.flatMap(_ => aa)
         )
         .flatMap(_ => finalizerState)
     )
 
-  private def transformToState(tkn: Token[_]): State[Context, String] = State[Context, String] {
-    context =>
+  def stateTransformer(
+      mthd:    CtMethod,
+      execCls: String,
+      execMtd: String
+  ): Token[_] => State[Context, String] =
+    (tkn: Token[_]) => transformToState(tkn, execCls, execMtd)
+
+  def transformToState(tkn: Token[_], execCls: String, execMtd: String): State[Context, String] =
+    State[Context, String] { context =>
       tkn match {
 //        case DEF(elem, expr) =>
         case READDEF(elem: ID) =>
           new ReadCreator(context, elem.scalaVal).handle
         case WRITE(expr)        => WriteCreator(context, expr).handle
         case LAMBDA(vars, expr) => LambdaCreator(context, vars, expr).handle
+        case LIST((lambda @ LAMBDA(_, _)) :: tail) =>
+          val (nctx, anonClassName) = transformToState(lambda, execCls, execMtd).run(context).value
+          AppCreator(nctx, tail, anonClassName, execCls, execMtd).handleLambdaApp()
       }
-  }
+    }
 
   private def finalizerState: State[Context, String] =
     State[Context, String] { ctx =>

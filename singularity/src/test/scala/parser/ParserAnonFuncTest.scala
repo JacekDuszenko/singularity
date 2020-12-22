@@ -1,6 +1,6 @@
 package parser
 
-import model.{ID, INT, LAMBDA, LIST}
+import model.{ID, INT, LAMBDA, LIST, STRING, WRITE}
 import util.ParseSpec
 
 class ParserAnonFuncTest extends ParseSpec {
@@ -45,6 +45,17 @@ class ParserAnonFuncTest extends ParseSpec {
       LAMBDA(
         List(ID("a"), ID("b"), ID("c"), ID("d")),
         LIST(List(ID("+"), INT(2), INT(3)))
+      )
+    )
+  }
+
+  it should "parse read lambda" in {
+    parser.parse(s"""( (lambda (x) (write x)) "XD" )""") shouldBe List(
+      LIST(
+        List(
+          LAMBDA(List(ID("x")), WRITE(ID("x"))),
+          STRING("XD")
+        )
       )
     )
   }

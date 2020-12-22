@@ -6,7 +6,7 @@ import codegen.creator.Creator
 import codegen.{Context, VariableMetadata}
 import javassist.ClassPool
 
-class ReadCreator(currentContext: Context, variableId: String) extends Creator {
+final class ReadCreator(currentContext: Context, variableId: String) extends Creator {
 
   def handle: (Context, String) = {
     handleCodegen()

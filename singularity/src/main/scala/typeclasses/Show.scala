@@ -9,10 +9,8 @@ trait Show[A] {
 object Show {
   def apply[A](implicit s: Show[A]): Show[A] = s
 
-  def instance[A](func: A => String): Show[A] = {
-    new Show[A] {
-      override def show(a: A) = func(a)
-    }
+  def instance[A](func: A => String): Show[A] = { (a: A) =>
+    func(a)
   }
 
   implicit val intShow: Show[Int]      = instance((num: Int) => s"this is an int: $num")

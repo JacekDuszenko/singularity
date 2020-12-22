@@ -3,14 +3,14 @@ package typeclasses
 import scala.annotation.tailrec
 
 object Rational {
-  def apply(nominator:            Int, denominator: Int): Rational = new Rational(nominator, denominator)
-  def apply(nominator:            Int): Rational = new Rational(nominator)
+  def apply(nominator:            Int, denominator: Int): Rational = Rational(nominator, denominator)
+  def apply(nominator:            Int): Rational = Rational(nominator)
   implicit def intToRational(num: Int): Rational = {
     Rational(num)
   }
 }
 
-class Rational(n: Int, d: Int) {
+final case class Rational(n: Int, d: Int) {
   require(d != 0, "denominator must be nonzero")
   private val g        = gcd(n.abs, d.abs)
   val numerator: Int   = n / g
