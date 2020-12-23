@@ -4,8 +4,9 @@ import cats.data.State
 import cats.effect.IO
 import codegen.CodegenHelpers.getMain
 import codegen.TypeSystemBootstrapper.initializeTypeSystemBuilder
-import codegen.creator.impl.{AppCreator, LambdaCreator, ReadCreator, WriteCreator}
+import codegen.creator.impl._
 import config.SETTINGS
+import config.SETTINGS.NativeOperators
 import javassist.{ClassPool, CtMethod}
 import model._
 
@@ -41,16 +42,41 @@ final case class CodeGenerator(tks: List[Token[_]]) {
   def transformToState(tkn: Token[_], execCls: String, execMtd: String): State[Context, String] =
     State[Context, String] { context =>
       tkn match {
-//        case DEF(elem, expr) =>
+        case DEF(elem, expr) => DefineCreator(context, elem.scalaVal, expr).handle
         case READDEF(elem: ID) =>
           new ReadCreator(context, elem.scalaVal).handle
         case WRITE(expr)        => WriteCreator(context, expr).handle
         case LAMBDA(vars, expr) => LambdaCreator(context, vars, expr).handle
         case LIST((lambda @ LAMBDA(_, _)) :: tail) =>
-          val (nctx, anonClassName) = transformToState(lambda, execCls, execMtd).run(context).value
-          AppCreator(nctx, tail, anonClassName, execCls, execMtd).handleLambdaApp()
+          generateLambdaApp(execCls, execMtd, context, lambda, tail)
+        case LIST(ID(varName) :: tail) =>
+          generateDefinedFunApp(execCls, execMtd, context, varName, tail)
       }
     }
+
+  private def generateLambdaApp(
+      execCls: String,
+      execMtd: String,
+      context: Context,
+      lambda:  LAMBDA,
+      tail:    List[Token[_]]
+  ) = {
+    val (nctx, anonClassName) = transformToState(lambda, execCls, execMtd).run(context).value
+    AppCreator(nctx, tail, anonClassName, execCls, execMtd).handleLambdaApp()
+  }
+
+  def isNativeOperator(varName: String) = NativeOperators.contains(varName)
+
+  private def generateDefinedFunApp(
+      execCls: String,
+      execMtd: String,
+      ctx:     Context,
+      varName: String,
+      tail:    List[Token[_]]
+  ): (Context, String) = {
+    if (isNativeOperator(varName)) NativeAppCreator(execCls, execMtd, ctx, varName, tail).handle
+    AppCreator(ctx, tail, ctx.scope(varName).anonClassName, execCls, execMtd).handleLambdaApp()
+  }
 
   private def finalizerState: State[Context, String] =
     State[Context, String] { ctx =>

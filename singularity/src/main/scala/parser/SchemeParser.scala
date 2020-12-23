@@ -25,7 +25,7 @@ object SchemeParser extends JavaTokenParsers {
     STRING(s)
   }
 
-  private def char: Parser[Token[Char]] = '\'' ~> ".".r <~ '\'' ^^ { e =>
+  private def char: Parser[Token[Char]] = spcd('\'' ~> ".".r <~ '\'') ^^ { e =>
     CHAR(e.charAt(0))
   }
 

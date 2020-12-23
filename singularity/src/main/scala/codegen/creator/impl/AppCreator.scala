@@ -27,12 +27,13 @@ final case class AppCreator(
     args.map {
       case ID(str)     => str
       case STRING(str) => s""" "$str" """
-      case BOOL(b)     => if (b) "true" else "false"
-      case INT(num)    => s"$num"
-      case CHAR(c)     => s"'$c'"
+      case BOOL(b)     => if (b) "new Boolean(true)" else "new Boolean(false)"
+      case INT(num)    => s"new Integer($num)"
+      case CHAR(c)     => s"new Character('$c')"
       case requiresEvaluation =>
         print(s"not implemented YET for token $requiresEvaluation"); "NOTIMPLEMENTED"
     }
   }
-  private def m: CtMethod = getMthd(execCls, execMtd)
+
+  override def m: CtMethod = getMthd(execCls, execMtd)
 }

@@ -65,6 +65,12 @@ object TypeSystemBootstrapper {
     clazz.addConstructor(CtNewConstructor.defaultConstructor(clazz))
     clazz.addMethod(CtNewMethod.make("public Object getValue() {return this.value;}", clazz))
     clazz.addMethod(
+      CtNewMethod.make(
+        s"""public String toString() {return "<Function type with $argsNumber args>";}""",
+        clazz
+      )
+    )
+    clazz.addMethod(
       CtNewMethod.make(s"public void call(${makeArgList(argsNumber)}) {}", clazz)
     )
     newCtx

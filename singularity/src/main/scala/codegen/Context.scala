@@ -8,7 +8,11 @@ final case class Context(
     anonCtr:           Int = 1
 )
 
-case class VariableMetadata(name: String, `type`: VariableType)
+final case class VariableMetadata(
+    name:          String,
+    `type`:        VariableType,
+    anonClassName: String = "unknown"
+)
 
 sealed trait VariableType extends EnumEntry
 
@@ -25,4 +29,12 @@ object VariableType extends Enum[VariableType] {
   case object FUN2   extends VariableType
   case object FUN3   extends VariableType
   case object FUN4   extends VariableType
+
+  def funTypeByArgumentsNumber(argNo: Int): VariableType = argNo match {
+    case 0 => VariableType.FUN0
+    case 1 => VariableType.FUN1
+    case 2 => VariableType.FUN2
+    case 3 => VariableType.FUN3
+    case 4 => VariableType.FUN4
+  }
 }

@@ -30,7 +30,7 @@ final case class LambdaCreator(ctx: Context, vars: List[Token[_]], expr: Token[_
     (ctx, clzName)
   }
 
-  def generateLambdaBody(
+  private def generateLambdaBody(
       mtd:  CtMethod,
       ctx:  Context,
       vars: List[String],
