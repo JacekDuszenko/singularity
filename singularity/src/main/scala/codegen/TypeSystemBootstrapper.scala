@@ -12,6 +12,7 @@ object TypeSystemBootstrapper {
       _ <- addValueInterface()
       _ <- addPrimitiveTypes()
       - <- addFuncTypes()
+      _ <- addOps()
     } yield "initialized type system"
 
   private def addMainClass() = {
@@ -25,6 +26,63 @@ object TypeSystemBootstrapper {
       )
       (newCtx, "initialized main class")
     }
+  }
+
+  private def addOps(): State[Context, String] = State[Context, String] { ctx =>
+    val (clazz, newCtx) = makeClass("Ops", ctx)
+    clazz.addMethod(
+      CtNewMethod.make(
+        """public static Integer add(Integer a, Integer b) {
+        |   return new java.lang.Integer(a.intValue() + b.intValue());
+        |}"""".stripMargin,
+        clazz
+      )
+    )
+
+    clazz.addMethod(
+      CtNewMethod.make(
+        """public static Integer mul(Integer a, Integer b) {
+        |   return new java.lang.Integer(a.intValue() * b.intValue());
+        |}"""".stripMargin,
+        clazz
+      )
+    )
+
+    clazz.addMethod(
+      CtNewMethod.make(
+        """public static Integer sub(Integer a, Integer b) {
+        |   return new java.lang.Integer(a.intValue() - b.intValue());
+        |}"""".stripMargin,
+        clazz
+      )
+    )
+
+    clazz.addMethod(
+      CtNewMethod.make(
+        """public static Integer div(Integer a, Integer b) {
+        |   return new java.lang.Integer(a.intValue() / b.intValue());
+        |}"""".stripMargin,
+        clazz
+      )
+    )
+
+    clazz.addMethod(
+      CtNewMethod.make(
+        """public static Integer mod(Integer a, Integer b) {
+          |   return new java.lang.Integer(a.intValue() % b.intValue());
+          |}"""".stripMargin,
+        clazz
+      )
+    )
+
+    clazz.addMethod(CtNewMethod.make("""public static Boolean eq(Object a, Object b) {
+        |   return new Boolean(a.equals(b));
+        |}"""".stripMargin, clazz))
+
+    clazz.addMethod(CtNewMethod.make("""public static Boolean neq(Object a, Object b) {
+        |   return new Boolean(!a.equals(b));
+        |}"""".stripMargin, clazz))
+    (newCtx, "added ops")
   }
 
   private def addValueInterface(): State[Context, String] = State[Context, String] { ctx =>

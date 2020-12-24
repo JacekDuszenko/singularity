@@ -20,7 +20,7 @@ final case class AppCreator(
     m.addLocalVariable(lambdaVar, getCls(anonClassName))
     m.insertAfter(s"""$lambdaVar = new $anonClassName();""")
     m.insertAfter(s"""$lambdaVar.call(${evalAppArgs(args).mkString(",")});""")
-    (ctx, "added lambda app")
+    (ctx, s"$lambdaVar.getValue()")
   }
 
   private def evalAppArgs(args: List[Token[_]]): List[String] = {

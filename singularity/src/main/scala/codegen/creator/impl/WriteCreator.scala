@@ -1,5 +1,6 @@
 package codegen.creator.impl
 
+import codegen.CodeGenerator.{generateDefinedFunApp, generateLambdaApp}
 import codegen.CodegenHelpers.getMain
 import codegen.Context
 import codegen.creator.Creator
@@ -8,25 +9,39 @@ import javassist.CtMethod
 import model._
 
 case class WriteCreator(ctx: Context, expr: Token[_]) extends Creator {
-  override def handle = {
-    handlePrint(getMain, expr)
-    (ctx, "handled write construction")
-  }
+  override def handle = handlePrint(getMain, expr, insideLambda = false, ctx)
 }
 
 object WriteCreator {
-  def handlePrint(methodToHandle: CtMethod, expr: Token[_], lambda: Boolean = false): Unit = {
+  def handlePrint(
+      methodToHandle: CtMethod,
+      expr:           Token[_],
+      insideLambda:   Boolean = false,
+      context:        Context
+  ): (Context, String) = {
+    val mtdName   = methodToHandle.getName
+    val clazzName = methodToHandle.getDeclaringClass.getName
     expr match {
-      case ID(_) if lambda    => prt(methodToHandle, "$1")
-      case ID(str)            => prt(methodToHandle, str)
-      case STRING(str)        => prt(methodToHandle, s""" "$str" """)
-      case BOOL(b)            => prt(methodToHandle, if (b) "true" else "false")
-      case INT(num)           => prt(methodToHandle, s"$num")
-      case CHAR(c)            => prt(methodToHandle, s"'$c'")
-      case requiresEvaluation => print(s"not implemented YET for token $requiresEvaluation")
+      case ID(_) if insideLambda => prt(methodToHandle, "$1", context)
+      case ID(str)               => prt(methodToHandle, str, context)
+      case STRING(str)           => prt(methodToHandle, s""" "$str" """, context)
+      case BOOL(b)               => prt(methodToHandle, if (b) "true" else "false", context)
+      case INT(num)              => prt(methodToHandle, s"$num", context)
+      case CHAR(c)               => prt(methodToHandle, s"'$c'", context)
+      case LIST((lambda @ LAMBDA(_, _)) :: tail) =>
+        val (nctx, insidePrint) = generateLambdaApp(clazzName, mtdName, context, lambda, tail)
+        prt(methodToHandle, insidePrint, nctx)
+      case LIST(ID(varName) :: tail) =>
+        val (nctx, insidePrint) = generateDefinedFunApp(clazzName, mtdName, context, varName, tail)
+        prt(methodToHandle, insidePrint, nctx)
+      case requiresEvaluation =>
+        print(s"not implemented YET for token $requiresEvaluation");
+        (context, "not implemented yet")
     }
   }
 
-  def prt(method: CtMethod, codeInside: String): Unit =
+  def prt(method: CtMethod, codeInside: String, ctx: Context): (Context, String) = {
     method.insertAfter(s"""System.out.println($codeInside);""")
+    (ctx, codeInside)
+  }
 }

@@ -1,4 +1,1 @@
-(define hej (lambda (x) (write x)))
-(define lol "brawo")
-(define gol 42)
-(hej "to twoj ulubiony zespol")
+(write (/ 1500 3))
