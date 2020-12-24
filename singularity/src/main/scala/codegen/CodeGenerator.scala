@@ -66,6 +66,14 @@ object CodeGenerator {
           generateLambdaApp(execCls, execMtd, context, lambda, tail)
         case LIST(ID(varName) :: tail) =>
           generateDefinedFunApp(execCls, execMtd, context, varName, tail)
+        case IF(cond: Token[_], positive: Token[_], negative: Token[_]) =>
+          generateDefinedFunApp(
+            execCls,
+            execMtd,
+            context,
+            "if",
+            cond :: positive :: negative :: Nil
+          )
       }
     }
 

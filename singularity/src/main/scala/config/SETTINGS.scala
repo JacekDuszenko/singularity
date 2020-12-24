@@ -12,11 +12,12 @@ object SETTINGS {
       "-"      -> SUB,
       "*"      -> MUL,
       "/"      -> DIV,
-      "length" -> null,
-      "%"      -> null,
-      "and"    -> null, //TODO implement
+      "length" -> null, //TODO String#length from JVM
+      "%"      -> MOD,
+      "and"    -> null, //TODO implement multi logic predicates
       "or"     -> null,
       "="      -> EQ,
-      "!="     -> EQ
+      "!="     -> NEQ,
+      "if"     -> IFOP
     )
 }

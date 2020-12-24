@@ -34,6 +34,15 @@ object WriteCreator {
       case LIST(ID(varName) :: tail) =>
         val (nctx, insidePrint) = generateDefinedFunApp(clazzName, mtdName, context, varName, tail)
         prt(methodToHandle, insidePrint, nctx)
+      case IF(cond: Token[_], positive: Token[_], negative: Token[_]) =>
+        val (nctx, insidePrint) = generateDefinedFunApp(
+          clazzName,
+          mtdName,
+          context,
+          "if",
+          cond :: positive :: negative :: Nil
+        )
+        prt(methodToHandle, insidePrint, nctx)
       case requiresEvaluation =>
         print(s"not implemented YET for token $requiresEvaluation");
         (context, "not implemented yet")

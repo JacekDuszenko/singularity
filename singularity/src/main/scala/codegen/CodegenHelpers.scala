@@ -10,6 +10,8 @@ object CodegenHelpers {
 
   def getCls(c: String): CtClass = ClassPool.getDefault.getCtClass(c)
 
+  def getObjCls: CtClass = ClassPool.getDefault.getCtClass("java.lang.Object")
+
   def makeClass(classname: String, ctx: Context): (CtClass, Context) = {
     (
       ClassPool.getDefault.makeClass(classname),

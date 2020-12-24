@@ -1,10 +1,10 @@
 package codegen.creator.impl
 
 import codegen.CodeGenerator.{generateDefinedFunApp, generateLambdaApp}
-import codegen.{CodegenHelpers, Context}
+import codegen.CodegenHelpers.getObjCls
 import codegen.creator.Creator
-import javassist.compiler.Javac.CtFieldWithInit
-import javassist.{ClassPool, CtField, CtMethod, CtNewConstructor, CtNewMethod}
+import codegen.{Context, VarCtr, VariableMetadata, VariableType}
+import javassist.{ClassPool, CtMethod, CtNewConstructor, CtNewMethod}
 import model._
 
 final case class LambdaCreator(ctx: Context, vars: List[Token[_]], expr: Token[_]) extends Creator {
@@ -19,9 +19,13 @@ final case class LambdaCreator(ctx: Context, vars: List[Token[_]], expr: Token[_
     val mthd =
       CtNewMethod.make(s"public void call(${toArgList(vars).mkString(",")}) {return;}", clz)
     clz.addMethod(mthd)
-    val newCtx = generateLambdaBody(mthd, lambdaAddedCtx, toArgList(vars), expr)
+    val newCtx = generateLambdaBody(mthd, lambdaAddedCtx, toNamesList(vars), expr)
 
     (clzName, newCtx)
+  }
+
+  private def toNamesList(vars: List[Token[_]]): List[String] = vars.map {
+    case ID(s) => s
   }
 
   private def toArgList(vars: List[Token[_]]): List[String] = vars.map {
@@ -38,16 +42,37 @@ final case class LambdaCreator(ctx: Context, vars: List[Token[_]], expr: Token[_
       ctx:  Context,
       vars: List[String],
       expr: Token[_]
-  ): Context =
-    expr match {
-      case WRITE(expr) => WriteCreator.handlePrint(mtd, expr, insideLambda = true, ctx)._1
+  ): Context = {
+    val varsAddedCtx = addVarsToCtx(mtd, vars, ctx)
+    val handledBodyCtx = expr match {
+      case WRITE(expr) => WriteCreator.handlePrint(mtd, expr, insideLambda = true, varsAddedCtx)._1
       case LIST((lambda @ LAMBDA(_, _)) :: tail) =>
-        val (nctx, varToSaveName) = generateLambdaApp(mtd, ctx, lambda, tail)
+        val (nctx, varToSaveName) = generateLambdaApp(mtd, varsAddedCtx, lambda, tail)
         mtd.insertAfter(s"value = $varToSaveName ;")
         nctx
       case LIST(ID(varName) :: tail) =>
-        val (nctx, varToSaveName) = generateDefinedFunApp(mtd, ctx, varName, tail)
+        val (nctx, varToSaveName) = generateDefinedFunApp(mtd, varsAddedCtx, varName, tail)
         mtd.insertAfter(s"value = $varToSaveName;")
         nctx
     }
+    removeVarsFromCtx(handledBodyCtx, vars)
+  }
+
+  def addVarsToCtx(mtd: CtMethod, vars: List[String], ctx: Context): Context =
+    vars
+      .zip(LazyList.from(1))
+      .foldLeft(ctx)((context, tpl) => {
+        val (variable, index) = tpl
+        val localName         = VarCtr.uniqVarName
+        mtd.addLocalVariable(localName, getObjCls)
+        mtd.insertBefore(s"$localName = $$$index;")
+        context.copy(
+          scope = context.scope + (variable -> VariableMetadata(localName, VariableType.UNKNOWN))
+        )
+      })
+
+  def removeVarsFromCtx(ctxWithVars: Context, varNames: List[String]): Context = {
+    varNames.foldLeft(ctxWithVars)((c, v) => c.copy(scope = c.scope.removed(v)))
+  }
+
 }
