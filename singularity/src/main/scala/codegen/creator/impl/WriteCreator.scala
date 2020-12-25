@@ -9,7 +9,7 @@ import javassist.CtMethod
 import model._
 
 case class WriteCreator(ctx: Context, expr: Token[_]) extends Creator {
-  override def handle = handlePrint(getMain, expr, insideLambda = false, ctx)
+  override def handle: (Context, String) = handlePrint(getMain, expr, insideLambda = false, ctx)
 }
 
 object WriteCreator {

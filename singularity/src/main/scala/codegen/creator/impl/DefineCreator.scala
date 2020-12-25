@@ -2,13 +2,13 @@ package codegen.creator.impl
 
 import codegen.CodegenHelpers.getCls
 import codegen.creator.Creator
-import codegen.{Context, VariableMetadata, VariableType}
+import codegen.{Context, VariableType}
 import model._
 
 final case class DefineCreator(ctx: Context, variableName: String, expr: Token[_]) extends Creator {
   override def handle: (Context, String) = {
 
-    val (tp, xpr, nctx, vtp) = evalExpr
+    val (tp, xpr, nctx, _) = evalExpr
     m.addLocalVariable(variableName, getCls(tp))
     m.insertAfter(s"""$variableName = new $xpr;$variableName.hashCode();""")
     (nctx, "generated lmbda body")
@@ -31,7 +31,7 @@ final case class DefineCreator(ctx: Context, variableName: String, expr: Token[_
         newCtx,
         VariableType.funTypeByArgumentsNumber(vars.length)
       )
-    case requiresEvaluation =>
+    case _ =>
       throw new RuntimeException("not evaluated yet")
   }
 }

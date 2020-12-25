@@ -1,7 +1,6 @@
 package codegen
 
 import enumeratum._
-import javax.lang.model.element.VariableElement
 
 final case class Context(
     scope:             Map[String, VariableMetadata],

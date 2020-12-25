@@ -82,7 +82,26 @@ object TypeSystemBootstrapper {
     clazz.addMethod(CtNewMethod.make("""public static Boolean neq(Object a, Object b) {
         |   return new Boolean(!a.equals(b));
         |}"""".stripMargin, clazz))
+
+    clazz.addMethod(
+      CtNewMethod.make(
+        """public static Integer strlen(Object a) {
+                                       |   return new Integer(((String)a).length());
+                                       |}"""".stripMargin,
+        clazz
+      )
+    )
+
+    clazz.addMethod(
+      CtNewMethod.make(
+        """public static Boolean leq(Object a, Object b) {
+                                       |   return new Boolean(((Integer)a).intValue() <= ((Integer)b).intValue());
+                                       |}"""".stripMargin,
+        clazz
+      )
+    )
     (newCtx, "added ops")
+
   }
 
   private def addValueInterface(): State[Context, String] = State[Context, String] { ctx =>

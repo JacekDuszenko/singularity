@@ -1,11 +1,11 @@
 package codegen.creator.impl
 
 import codegen.CodeGenerator.{generateDefinedFunApp, generateLambdaApp}
-import codegen.CodegenHelpers.{getCls, getMthd}
+import codegen.CodegenHelpers.getMthd
 import codegen.creator.Creator
 import codegen.{Context, VarCtr}
 import config.SETTINGS.NativeOperators
-import javassist.{ClassPool, CtClass, CtMethod}
+import javassist.{ClassPool, CtMethod}
 import model.{BOOL, STRING, _}
 
 final case class NativeAppCreator(
@@ -24,6 +24,13 @@ final case class NativeAppCreator(
     val intermediateVar   = VarCtr.uniqVarName
     m.addLocalVariable(intermediateVar, ClassPool.getDefault.get(ctReturnType))
     op.argLen match {
+      case 1 if op == JVMSTRING =>
+        val fst :: _     = tail
+        val (c1, fstVar) = evalArg(fst, ctx)
+        val body =
+          s"""$intermediateVar = ${op.formatArgs(fstVar, "irrelevant")};$intermediateVar.hashCode();"""
+        m.insertAfter(body)
+        (c1, intermediateVar)
       case 2 =>
         val fst :: snd :: _ = tail
         val (c1, fstVar)    = evalArg(fst, ctx)
@@ -104,10 +111,10 @@ final case class NativeAppCreator(
     case LIST(ID(varName) :: tail) =>
       generateDefinedFunApp(cls, mtd, ctx, varName, tail)
 
-    case requiresEvaluation => (ctx, "requires evaluation")
+    case _ => (ctx, "requires evaluation")
   }
 
-  override def m = getMthd(execCls, execMtd)
+  override def m: CtMethod = getMthd(execCls, execMtd)
 }
 
 object NativeAppCreator {}

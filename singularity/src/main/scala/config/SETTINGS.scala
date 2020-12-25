@@ -8,16 +8,17 @@ object SETTINGS {
 
   val NativeOperators: Map[String, NativeOperator] =
     Map(
-      "+"      -> PLUS,
-      "-"      -> SUB,
-      "*"      -> MUL,
-      "/"      -> DIV,
-      "length" -> null, //TODO String#length from JVM
-      "%"      -> MOD,
-      "and"    -> null, //TODO implement multi logic predicates
-      "or"     -> null,
-      "="      -> EQ,
-      "!="     -> NEQ,
-      "if"     -> IFOP
+      "+"                 -> PLUS,
+      "-"                 -> SUB,
+      "*"                 -> MUL,
+      "/"                 -> DIV,
+      "JVM.String.length" -> JVMSTRING,
+      "%"                 -> MOD,
+      "and"               -> null, //TODO implement multi logic predicates
+      "or"                -> null,
+      "="                 -> EQ,
+      "!="                -> NEQ,
+      "if"                -> IFOP,
+      "<="                -> LEQ
     )
 }

@@ -13,7 +13,7 @@ object SchemeParser extends JavaTokenParsers {
     ("#t".r | "#f".r) ^^ { case "#t" => BOOL(true); case "#f" => BOOL(false) }
 
   private def id: Parser[Token[String]] =
-    """[a-zA-Z=*%+/<>!\-\?][a-zA-Z0-9=*+/<>!\?]*""".r ^^ { matched =>
+    """[a-zA-Z=*%+/<>!\-\?][a-zA-Z0-9=*+/<>!\?\.]*""".r ^^ { matched =>
       ID(matched)
     }
 

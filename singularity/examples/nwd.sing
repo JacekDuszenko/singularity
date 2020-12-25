@@ -1,0 +1,5 @@
+(define nwd (lambda (a b) (if (= b 0) a (nwd b (% a b) ) ) ))
+
+(write (nwd 133 32))
+(write (nwd 42 56))
+(write (nwd 100 100))

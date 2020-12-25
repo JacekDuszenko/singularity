@@ -2,7 +2,6 @@ package model
 
 import codegen.VariableType
 import codegen.VariableType._
-import javassist.CtClass
 
 sealed trait NativeOperator {
   def requiredArgTypes: List[VariableType]
@@ -94,6 +93,30 @@ case object NEQ extends NativeOperator {
   override def getResultType = ("Boolean", "java.lang.Boolean")
 
   override val formatArgs = (fst, snd) => s"""Ops#neq($fst, $snd)"""
+}
+
+case object LEQ extends NativeOperator {
+  override def requiredArgTypes = List(NUM, NUM)
+
+  override def argLen = 2
+
+  override def syntax = "<="
+
+  override def getResultType = ("Boolean", "java.lang.Boolean")
+
+  override val formatArgs = (fst, snd) => s"""Ops#leq($fst, $snd)"""
+}
+
+case object JVMSTRING extends NativeOperator {
+  override def requiredArgTypes = List(STRING)
+
+  override def argLen = 1
+
+  override def syntax = "JVM.String.length"
+
+  override def getResultType = ("Integer", "java.lang.Integer")
+
+  override val formatArgs = (fst, _) => s"""Ops#strlen($fst)"""
 }
 
 case object IFOP extends NativeOperator {
