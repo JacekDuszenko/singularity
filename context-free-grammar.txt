@@ -1,0 +1,38 @@
+<program>              -->  <form>*
+<form>                 -->  <definition> | <expression>
+
+<definition>           -->  <variable definition>
+
+<variable definition>  -->  (define <variable> <expression>)
+                          | (define <variable> read)
+                          |	(define (<variable> <variable>*) <body>)
+
+<expression>           -->  <constant>
+                          |	<variable>
+                          |	(lambda <formals> <body>)
+                          | (list <expression>*)
+                          |	(if <expression> <expression> <expression>) 
+                          |	<application>
+                          |	(let ([<identifier> <expression>]+) <expression>+)
+                          | (write <expression>)
+
+                          
+<constant>             -->  <boolean> 
+                          | <number>
+                          | <character>
+                          | <string>
+
+<formals>              -->	<variable> | (<variable>*)
+<variable>             -->  <identifier>
+<body>                 --> <definition>* <expression>+
+<application>          -->  (<expression> <expression>*)
+
+
+<identifier>           -->  <letter> <subsequent>* | + | - | ...
+<subsequent>           -->  <letter> | <digit> | . | + | -
+<letter>               -->  a | b | ... | z
+<digit>                -->  0 | 1 | ... | 9
+<boolean>	             -->	#t | #f
+<number>               --> <digit>+
+<character>            --> '<letter>'
+<string>               -->  "<letter>*"
