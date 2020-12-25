@@ -2,13 +2,15 @@ package codegen.creator.impl
 
 import codegen.CodeGenerator.{generateDefinedFunApp, generateLambdaApp}
 import codegen.CodegenHelpers.getObjCls
+import codegen.VariableType.funTypeByArgumentsNumber
 import codegen.creator.Creator
 import codegen.{Context, VarCtr, VariableMetadata, VariableType}
-import javassist.{ClassPool, CtMethod, CtNewConstructor, CtNewMethod}
+import javassist.{ClassPool, CtField, CtMethod, CtNewConstructor, CtNewMethod}
 import model._
+import cats.implicits._
 
 final case class LambdaCreator(ctx: Context, vars: List[Token[_]], expr: Token[_]) extends Creator {
-  def mkAnonClass(length: Int): (String, Context) = {
+  def mkAnonClass(length: Int, lambdaName: String = ""): (String, Context) = {
     val parent  = ClassPool.getDefault.get(s"Fun$length")
     val clzName = s"Fun${length}Anon${ctx.anonCtr}"
     val clz     = ClassPool.getDefault.makeClass(clzName)
@@ -19,8 +21,17 @@ final case class LambdaCreator(ctx: Context, vars: List[Token[_]], expr: Token[_
     val mthd =
       CtNewMethod.make(s"public void call(${toArgList(vars).mkString(",")}) {return;}", clz)
     clz.addMethod(mthd)
-    val newCtx = generateLambdaBody(mthd, lambdaAddedCtx, toNamesList(vars), expr)
 
+    val withLambdaNameIfDefined = lambdaAddedCtx.copy(
+      scope = lambdaAddedCtx.scope + (lambdaName -> VariableMetadata(
+        lambdaName,
+        funTypeByArgumentsNumber(length),
+        clzName
+      ))
+    )
+
+    val contContext = if (lambdaName =!= "") withLambdaNameIfDefined else lambdaAddedCtx
+    val newCtx      = generateLambdaBody(mthd, contContext, toNamesList(vars), expr)
     (clzName, newCtx)
   }
 
@@ -54,6 +65,15 @@ final case class LambdaCreator(ctx: Context, vars: List[Token[_]], expr: Token[_
         val (nctx, varToSaveName) = generateDefinedFunApp(mtd, varsAddedCtx, varName, tail)
         mtd.insertAfter(s"value = $varToSaveName;")
         nctx
+      case IF(cond, positive, negative) =>
+        val (nctx, varToSaveName) = generateDefinedFunApp(
+          mtd,
+          varsAddedCtx,
+          "if",
+          cond :: positive :: negative :: Nil
+        )
+        mtd.insertAfter(s"value = $varToSaveName;")
+        nctx
     }
     removeVarsFromCtx(handledBodyCtx, vars)
   }
@@ -65,7 +85,11 @@ final case class LambdaCreator(ctx: Context, vars: List[Token[_]], expr: Token[_
         val (variable, index) = tpl
         val localName         = VarCtr.uniqVarName
         mtd.addLocalVariable(localName, getObjCls)
-        mtd.insertBefore(s"$localName = $$$index;")
+        mtd.insertAfter(s"$localName = $$$index;")
+        mtd.getDeclaringClass.addField(
+          CtField.make(s"public java.lang.Object $localName;", mtd.getDeclaringClass)
+        )
+        mtd.insertAfter(s"$$0.$localName = $localName;")
         context.copy(
           scope = context.scope + (variable -> VariableMetadata(localName, VariableType.UNKNOWN))
         )

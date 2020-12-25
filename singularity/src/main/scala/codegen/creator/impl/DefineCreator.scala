@@ -7,19 +7,11 @@ import model._
 
 final case class DefineCreator(ctx: Context, variableName: String, expr: Token[_]) extends Creator {
   override def handle: (Context, String) = {
+
     val (tp, xpr, nctx, vtp) = evalExpr
     m.addLocalVariable(variableName, getCls(tp))
     m.insertAfter(s"""$variableName = new $xpr;$variableName.hashCode();""")
-    (
-      nctx.copy(
-        scope = nctx.scope + (variableName -> VariableMetadata(
-          variableName,
-          vtp,
-          anonClassName = tp
-        ))
-      ),
-      "defined expression"
-    )
+    (nctx, "generated lmbda body")
   }
 
   private def evalExpr: (String, String, Context, VariableType) = expr match {
@@ -31,7 +23,8 @@ final case class DefineCreator(ctx: Context, variableName: String, expr: Token[_
     case INT(num) => ("java.lang.Object", s"Integer($num)", ctx, VariableType.NUM)
     case CHAR(c)  => ("java.lang.Object", s"Character('$c')", ctx, VariableType.CHAR)
     case LAMBDA(vars, expr) =>
-      val (anonClassName, newCtx) = LambdaCreator(ctx, vars, expr).mkAnonClass(vars.length)
+      val (anonClassName, newCtx) =
+        LambdaCreator(ctx, vars, expr).mkAnonClass(vars.length, lambdaName = variableName)
       (
         anonClassName,
         s"$anonClassName()",

@@ -1,5 +1,0 @@
-(define funkcja (lambda (a b) (% a b) ))
-(write (funkcja 5 2))
-
-(define func (lambda (x) (= x 10)))
-(write (if (func 10) "TATATA" "DADADA" ) )

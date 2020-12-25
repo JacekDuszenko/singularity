@@ -104,6 +104,8 @@ object CodeGenerator {
   ): (Context, String) = {
     if (isNativeOperator(varName))
       NativeAppCreator(mtd.getDeclaringClass.getName, mtd.getName, ctx, varName, tail).handle
+    else if (isRecursiveOperator(varName, ctx))
+      RecursiveAppCreator(mtd.getDeclaringClass.getName, mtd.getName, ctx, varName, tail).handle
     else
       AppCreator(
         ctx,
@@ -114,6 +116,9 @@ object CodeGenerator {
       ).handleLambdaApp()
   }
 
+  def isRecursiveOperator(varName: String, ctx: Context) =
+    ctx.scope.keySet contains varName
+
   def generateDefinedFunApp(
       execCls: String,
       execMtd: String,
@@ -122,6 +127,8 @@ object CodeGenerator {
       tail:    List[Token[_]]
   ): (Context, String) = {
     if (isNativeOperator(varName)) NativeAppCreator(execCls, execMtd, ctx, varName, tail).handle
+    else if (isRecursiveOperator(varName, ctx))
+      RecursiveAppCreator(execCls, execMtd, ctx, varName, tail).handle
     else
       AppCreator(ctx, tail, ctx.scope(varName).anonClassName, execCls, execMtd).handleLambdaApp()
   }
