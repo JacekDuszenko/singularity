@@ -14,8 +14,8 @@ object SETTINGS {
       "/"                 -> DIV,
       "JVM.String.length" -> JVMSTRING,
       "%"                 -> MOD,
-      "and"               -> null, //TODO implement multi logic predicates
-      "or"                -> null,
+      "and"               -> AND,
+      "or"                -> OR,
       "="                 -> EQ,
       "!="                -> NEQ,
       "if"                -> IFOP,

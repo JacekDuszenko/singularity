@@ -39,6 +39,18 @@ final case class NativeAppCreator(
           $intermediateVar.hashCode();"""
         m.insertAfter(body)
         (c2, intermediateVar)
+      case Int.MaxValue =>
+        val opSign = if (op == AND) "&&" else "||"
+        val (nctx, evaluatedVarz) =
+          tail.foldLeft((ctx, List[String]()))((acc: (Context, List[String]), elem: Token[_]) => {
+            val (c, argn) = evalArg(elem, acc._1)
+            (c, acc._2 :+ argn)
+          })
+        val formatted =
+          evaluatedVarz.map(v => s""" $v.booleanValue() """).mkString(opSign)
+        val body = s"""$intermediateVar = new Boolean($formatted) ;"""
+        m.insertAfter(body)
+        (nctx, intermediateVar)
       case 3 if op == IFOP =>
         val cond :: pos :: neg :: Nil = tail
         val ifStatementMethodName     = VarCtr.uniqVarName

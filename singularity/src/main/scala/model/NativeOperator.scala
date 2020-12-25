@@ -128,5 +128,29 @@ case object IFOP extends NativeOperator {
 
   override def syntax = "if"
 
-  override val formatArgs = (fst, snd) => s"""irrelevant"""
+  override val formatArgs = (_, _) => s"""irrelevant"""
+}
+
+case object AND extends NativeOperator {
+  override def requiredArgTypes = List()
+
+  override def getResultType = ("Boolean", "java.lang.Boolean")
+
+  override def argLen = Int.MaxValue
+
+  override def syntax = "and"
+
+  override val formatArgs = (_, _) => s"""irrelevant"""
+}
+
+case object OR extends NativeOperator {
+  override def requiredArgTypes = List()
+
+  override def getResultType = ("Boolean", "java.lang.Boolean")
+
+  override def argLen = Int.MaxValue
+
+  override def syntax = "or"
+
+  override val formatArgs = (_, _) => s"""irrelevant"""
 }
