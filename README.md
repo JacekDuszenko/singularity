@@ -8,19 +8,16 @@ Development plan:
 - [x] read and write instructions
 - [x] function invokation syntax
 - [x] if else then
-- [x] let rec 
+- [x] let exprs 
 - [x] pattern matching
 
 2. ast traversal & bytecode gen
 - [x] main class with main method 
 - [x] read and write bytecode gen
-- [ ] function invokation
-- [ ] if else then
-- [ ] let rec
-- [ ] pattern matching
+- [x] function invokation
+- [x] if else then
 
 
 3. optimization & utility
 - [x] import native java classes
-- [ ] recursion tco
-- [ ] repl 
+- [x] recursion tco
