@@ -1,5 +1,7 @@
 # singularity
-Purely functional language for JVM platform with compiler written in Scala. The language is a subset of Scheme enriched with a JVM directive which implements Java interoperability - user can use functions from Java standard library. There are plenty of syntactic constructs that are handled only partially, but, e.g. following programs compile correctly:
+A very simple purely functional language for the JVM platform with the compiler written in Scala. This project was part of my bachelor's degree final thesis and even the written thesis itself can be found in this repo (it is in Polish though and of no great value anyways).
+
+The language is a subset of Scheme enriched with a JVM directive which implements Java interoperability - user can use functions from Java standard library. There are plenty of syntactic constructs that are handled only partially, but, e.g. following programs compile correctly:
 
 ```
 (define fib (lambda (n) (if (<= n 2) 1 (+ (fib (- n 1)) (fib (- n 2))))))
